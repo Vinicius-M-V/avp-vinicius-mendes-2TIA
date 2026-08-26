@@ -5,17 +5,6 @@ const port = 1610;
 
 app.use(express.json());
 
-const alunos = [
-  { id: 1, nome: "Augusto", turma: "2TIB" },
-  { id: 2, nome: "Gustavo", turma: "2TIB" },
-  { id: 3, nome: "Rayssa", turma: "2TIB" },
-  { id: 4, nome: "Amanda", turma: "2TIB" },
-  { id: 5, nome: "Marcos", turma: "2TIB" },
-  { id: 6, nome: "Michelly", turma: "2TIB" },
-  { id: 7, nome: "Maria Fernanda", turma: "2TIB" },
-  { id: 8, nome: "Fellype", turma: "2TIB" }
-];
-
 const herois = [
   { id: 1, nome: "Spider-Man", equipe: "Solo" },
   { id: 2, nome: "Wolverine", equipe: "X-Men" },
@@ -61,11 +50,8 @@ app.get("/herois", (req, res) => {
   res.json(herois);
 });
 
-app.patch("/herois/:id", (req, res) => {
+app.get("/herois/:id", (req, res) => {
   const id = Number(req.params.id);
-
-  const {nome, equipe} = req.body;
-
   const heroi = herois.find((heroi) => heroi.id === id);
 
   if (!heroi) {
@@ -74,29 +60,20 @@ app.patch("/herois/:id", (req, res) => {
     });
   }
 
-  if (nome) {
-    heroi.nome = nome;
-  }
-
-  if (equipe) {
-    heroi.equipe = equipe;
-  }
-
   res.json(heroi);
 });
 
 app.delete("/herois/:id", (req, res) => {
-  const id = Number(req.params.id);
+  const id = Number(req.params.id); 
+  const heroiExiste = herois.findIndex((heroi) => heroi.id === id);
 
-  const heroiExiste = herois.find((heroi) => heroi.id === id);
-
-  if (!heroiExiste) {
+  if (heroiExiste === -1) {
     return res.status(404).json({
       message: "Herói não encontrado"
     });
   }
 
-herois.splice(heroiExiste, 1);
+  herois.splice(heroiExiste, 1);
 
   res.json({
     message: "Herói removido com sucesso"
@@ -118,19 +95,27 @@ app.post("/herois", (req, res) => {
   });
 });
 
-app.post("/alunos", (req, res) => {
-  const novoAluno = {
-    id: alunos.length + 1,
-    nome: req.body.nome,
-    turma: req.body.turma
-  };
+app.patch("/herois/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const { nome, equipe } = req.body;
 
-  alunos.push(novoAluno);
+  const heroi = herois.find((heroi) => heroi.id === id);
 
-  res.status(201).json({
-    mensagem: "Aluno cadastrado com sucesso",
-    aluno: novoAluno
-  });
+  if (!heroi) {
+    return res.status(404).json({
+      message: "Herói não encontrado"
+    });
+  }
+
+  if (nome) {
+    heroi.nome = nome;
+  }
+
+  if (equipe) {
+    heroi.equipe = equipe;
+  }
+
+  res.json(heroi);
 });
 
 app.listen(port, () => {
