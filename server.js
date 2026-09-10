@@ -1,4 +1,5 @@
 import express from "express";
+import "dotenv/config";
 
 const app = express();
 const port = 1610;
@@ -38,6 +39,17 @@ const herois = [
   { id: 30, nome: "Emma Frost", equipe: "X-Men" },
 ];
 
+function autenticar (req, res, next) {
+  const authHeader = req.headers.autorizathion;
+  const tokenSecret = process.env.TOKEN_SECRETO;
+
+  if (authHeader !== `Bearer ${tokenSecret}`) {
+    return res.status(401).json({erro: "Acesso não autorizado. Token ausente ou invalido"});
+  }
+
+  next();
+};
+
 app.get("/", (req, res) => {
   res.json({
     mensagem: "Servidor Express funcionando!",
@@ -63,7 +75,7 @@ app.get("/herois/:id", (req, res) => {
   res.json(heroi);
 });
 
-app.delete("/herois/:id", (req, res) => {
+app.delete("/herois/:id", autenticar, (req, res) => {
   const id = Number(req.params.id); 
   const heroiExiste = herois.findIndex((heroi) => heroi.id === id);
 
@@ -80,7 +92,7 @@ app.delete("/herois/:id", (req, res) => {
   });
 });
 
-app.post("/herois", (req, res) => {
+app.post("/herois", autenticar, (req, res) => {
   const novoHerói = {
     id: herois.length + 1,
     nome: req.body.nome,
@@ -95,7 +107,7 @@ app.post("/herois", (req, res) => {
   });
 });
 
-app.patch("/herois/:id", (req, res) => {
+app.patch("/herois/:id", autenticar, (req, res) => {
   const id = Number(req.params.id);
   const { nome, equipe } = req.body;
 
