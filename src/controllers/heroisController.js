@@ -1,12 +1,13 @@
-import herois from "../data/herois.js";
+import * as heroisModel from "../models/heroisModel.js";
 
-export function listarHerois(req, res) {
+export async function listarTodos(req, res) {
+    const herois = await heroisModel.listarTodos();
     res.json(herois);
 }
 
-export function buscarHeroiporId(req, res) {
+export async function buscarHeroiporId(req, res) {
     const id = Number(req.params.id);
-    const heroi = herois.find((heroi) => heroi.id === id);
+    const heroi = await heroisModel.buscarPorId(id);
 
     if (!heroi) {
         return res.status(404).json({
@@ -17,20 +18,12 @@ export function buscarHeroiporId(req, res) {
     res.json(heroi);
 }
 
-export function postarHeroi(req, res) {
-    const { nome, primeiraAparição } = req.body;
+export async function cadastrarHeroi(req, res) {
+    const { nome, primeiraAparicao } = req.body;
 
-    if (!nome || primeiraAparição === undefined) {
-        return res.status(400).json({ message: "Dados inválidos" });
-    }
-
-    const novoHerói = {
-        id: herois.length + 1,
-        nome,
-        primeiraAparição
-    };
-
-    herois.push(novoHerói);
+    const heroi = await heroisModel.criar({
+        nome, primeiraAparicao
+    });
 
     res.status(201).json({
         mensagem: "Herói cadastrado com sucesso",
@@ -38,7 +31,7 @@ export function postarHeroi(req, res) {
     });
 }
 
-export function atualizarHeroi(req, res) {
+export async function atualizarHeroi(req, res) {
     const id = Number(req.params.id);
     const { nome, primeiraAparição } = req.body;
 
