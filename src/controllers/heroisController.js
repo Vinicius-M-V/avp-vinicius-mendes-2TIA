@@ -1,6 +1,6 @@
 import * as heroisModel from "../models/heroisModel.js";
 
-export async function listarTodos(req, res) {
+export async function listarHerois(req, res) {
     const herois = await heroisModel.listarTodos();
     res.json(herois);
 }
@@ -18,7 +18,7 @@ export async function buscarHeroiporId(req, res) {
     res.json(heroi);
 }
 
-export async function cadastrarHeroi(req, res) {
+export async function postarHeroi(req, res) {
     const { nome, primeiraAparicao } = req.body;
 
     const heroi = await heroisModel.criar({
